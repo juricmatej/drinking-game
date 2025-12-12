@@ -1,0 +1,758 @@
+// Global state management
+let currentUser = null;
+let currentSession = null;
+let currentChallenge = null;
+let currentGroupId = null;
+
+// Sample data storage (in production, this would be a backend database)
+let users = [
+    { username: 'demo', totalPoints: 0, completedChallenges: 0, friends: [], friendRequests: [], sentRequests: [] }
+];
+
+let groups = [
+    {
+        id: 1,
+        name: 'Nocturnal Crew',
+        description: 'Skupina za vikend zabavo',
+        owner: 'demo',
+        members: ['demo'],
+        requests: []
+    }
+];
+
+let sessions = [
+    {
+        id: 1,
+        name: 'Petkov večer @ Club XYZ',
+        location: 'Club XYZ',
+        date: '2025-12-12',
+        active: true,
+        players: []
+    },
+    {
+        id: 2,
+        name: 'Sobotna zabava @ Diskoteka 90',
+        location: 'Diskoteka 90',
+        date: '2025-12-13',
+        active: true,
+        players: []
+    }
+];
+
+let challenges = [
+    { id: 1, title: 'Kupi pijačo za nekoga v rdeči jopici', description: 'Najdi osebo v rdeči obleki in ji kupi pijačo', points: 50, type: 'photo', completed: false },
+    { id: 2, title: 'Selfie z DJ-jem', description: 'Naredi selfie s DJ-jem', points: 100, type: 'photo', completed: false },
+    { id: 3, title: 'Nazdravite z neznancem', description: 'Najdi neznanko/neznavca in nazdravite', points: 30, type: 'user_confirm', completed: false },
+    { id: 4, title: 'Skeniraj QR kodo pri baru', description: 'Najdi QR kodo pri glavnem baru', points: 20, type: 'qr', completed: false },
+    { id: 5, title: 'Zaplesaj pred sceno', description: 'Pokaži svoje plesne spretnosti', points: 40, type: 'photo', completed: false },
+    { id: 6, title: 'Povej DJ-ju song request', description: 'Predlagaj pesem DJ-ju', points: 25, type: 'user_confirm', completed: false },
+    { id: 7, title: 'Spoznaj 3 nove ljudi', description: 'Predstavi se trem novim ljudem', points: 75, type: 'user_confirm', completed: false },
+    { id: 8, title: 'Fotografija z bartenderjem', description: 'Naredi fotografijo z bartenderjem', points: 35, type: 'photo', completed: false }
+];
+
+// Utility functions
+function showScreen(screenId) {
+    document.querySelectorAll('.screen').forEach(screen => {
+        screen.classList.remove('active');
+    });
+    document.getElementById(screenId).classList.add('active');
+
+    // Update content based on screen
+    if (screenId === 'mainMenu') {
+        updateMainMenu();
+    } else if (screenId === 'sessionScreen') {
+        loadSessions();
+    } else if (screenId === 'groupsScreen') {
+        loadMyGroups();
+    } else if (screenId === 'friendsScreen') {
+        loadFriends();
+    } else if (screenId === 'leaderboardScreen') {
+        loadGlobalLeaderboard();
+    } else if (screenId === 'profileScreen') {
+        loadProfile();
+    }
+}
+
+function switchTab(tabName) {
+    document.querySelectorAll('#gameScreen .tab').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    document.querySelectorAll('#gameScreen .tab-content').forEach(content => {
+        content.classList.remove('active');
+    });
+
+    event.target.classList.add('active');
+    if (tabName === 'challenges') {
+        document.getElementById('challengesTab').classList.add('active');
+    } else if (tabName === 'live-leaderboard') {
+        document.getElementById('liveLeaderboardTab').classList.add('active');
+        updateLiveLeaderboard();
+    }
+}
+
+function switchGroupTab(tabName) {
+    document.querySelectorAll('#groupsScreen .tab').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    document.querySelectorAll('#groupsScreen .tab-content').forEach(content => {
+        content.classList.remove('active');
+    });
+
+    event.target.classList.add('active');
+    if (tabName === 'my-groups') {
+        document.getElementById('myGroupsTab').classList.add('active');
+        loadMyGroups();
+    } else if (tabName === 'search-groups') {
+        document.getElementById('searchGroupsTab').classList.add('active');
+    } else if (tabName === 'requests') {
+        document.getElementById('requestsTab').classList.add('active');
+        loadGroupRequests();
+    }
+}
+
+function switchFriendTab(tabName) {
+    document.querySelectorAll('#friendsScreen .tab').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    document.querySelectorAll('#friendsScreen .tab-content').forEach(content => {
+        content.classList.remove('active');
+    });
+
+    event.target.classList.add('active');
+    if (tabName === 'friends-list') {
+        document.getElementById('friendsListTab').classList.add('active');
+        loadFriends();
+    } else if (tabName === 'friend-requests') {
+        document.getElementById('friendRequestsTab').classList.add('active');
+        loadFriendRequests();
+    } else if (tabName === 'find-friends') {
+        document.getElementById('findFriendsTab').classList.add('active');
+    }
+}
+
+// Login/Logout
+function login() {
+    const username = document.getElementById('usernameInput').value.trim();
+    if (!username) {
+        alert('Prosim vnesite uporabniško ime');
+        return;
+    }
+
+    let user = users.find(u => u.username === username);
+    if (!user) {
+        user = {
+            username: username,
+            totalPoints: 0,
+            completedChallenges: 0,
+            friends: [],
+            friendRequests: [],
+            sentRequests: []
+        };
+        users.push(user);
+    }
+
+    currentUser = user;
+    showScreen('mainMenu');
+}
+
+function logout() {
+    currentUser = null;
+    currentSession = null;
+    showScreen('loginScreen');
+    document.getElementById('usernameInput').value = '';
+}
+
+function updateMainMenu() {
+    document.getElementById('usernameText').textContent = currentUser.username;
+}
+
+// Sessions
+function loadSessions() {
+    const sessionsList = document.getElementById('sessionsList');
+    sessionsList.innerHTML = '';
+
+    if (sessions.length === 0) {
+        sessionsList.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🎯</div><p>Trenutno ni aktivnih sej</p></div>';
+        return;
+    }
+
+    sessions.forEach(session => {
+        const card = document.createElement('div');
+        card.className = 'session-card';
+        card.innerHTML = `
+            <h3>${session.name}</h3>
+            <p>📍 ${session.location}</p>
+            <p>📅 ${session.date}</p>
+            <p>👥 ${session.players.length} igralcev</p>
+        `;
+        card.onclick = () => joinSession(session);
+        sessionsList.appendChild(card);
+    });
+}
+
+function joinSession(session) {
+    currentSession = session;
+
+    if (!session.players.find(p => p.username === currentUser.username)) {
+        session.players.push({
+            username: currentUser.username,
+            points: 0,
+            challenges: JSON.parse(JSON.stringify(challenges))
+        });
+    }
+
+    document.getElementById('sessionName').textContent = session.name;
+    loadChallenges();
+    showScreen('gameScreen');
+}
+
+function loadChallenges() {
+    const player = currentSession.players.find(p => p.username === currentUser.username);
+    const challengesList = document.getElementById('challengesList');
+    challengesList.innerHTML = '';
+
+    document.getElementById('userPoints').textContent = player.points;
+
+    player.challenges.forEach(challenge => {
+        const card = document.createElement('div');
+        card.className = `challenge-card ${challenge.completed ? 'completed' : ''}`;
+        card.innerHTML = `
+            <div class="challenge-info">
+                <h4>${challenge.completed ? '✅ ' : ''}${challenge.title}</h4>
+                <p>${challenge.description}</p>
+            </div>
+            <div class="challenge-points">${challenge.points} točk</div>
+        `;
+        if (!challenge.completed) {
+            card.onclick = () => openChallengeModal(challenge);
+        }
+        challengesList.appendChild(card);
+    });
+}
+
+function updateLiveLeaderboard() {
+    const leaderboard = document.getElementById('liveLeaderboard');
+    leaderboard.innerHTML = '';
+
+    const sortedPlayers = [...currentSession.players].sort((a, b) => b.points - a.points);
+
+    if (sortedPlayers.length === 0) {
+        leaderboard.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🏆</div><p>Še ni igralcev</p></div>';
+        return;
+    }
+
+    sortedPlayers.forEach((player, index) => {
+        const item = document.createElement('div');
+        item.className = 'leaderboard-item';
+
+        let rankClass = '';
+        if (index === 0) rankClass = 'gold';
+        else if (index === 1) rankClass = 'silver';
+        else if (index === 2) rankClass = 'bronze';
+
+        item.innerHTML = `
+            <div class="leaderboard-rank ${rankClass}">${index + 1}</div>
+            <div class="leaderboard-name">${player.username}</div>
+            <div class="leaderboard-points">${player.points}</div>
+        `;
+        leaderboard.appendChild(item);
+    });
+}
+
+// Challenge Modal
+function openChallengeModal(challenge) {
+    currentChallenge = challenge;
+
+    document.getElementById('challengeTitle').textContent = challenge.title;
+    document.getElementById('challengeDescription').textContent = challenge.description;
+    document.getElementById('challengePoints').textContent = challenge.points;
+
+    // Hide all completion methods
+    document.getElementById('photoUpload').style.display = 'none';
+    document.getElementById('qrScan').style.display = 'none';
+    document.getElementById('userConfirm').style.display = 'none';
+
+    // Show appropriate completion method
+    if (challenge.type === 'photo') {
+        document.getElementById('photoUpload').style.display = 'block';
+    } else if (challenge.type === 'qr') {
+        document.getElementById('qrScan').style.display = 'block';
+    } else if (challenge.type === 'user_confirm') {
+        document.getElementById('userConfirm').style.display = 'block';
+    }
+
+    document.getElementById('challengeModal').classList.add('active');
+}
+
+function closeChallengeModal() {
+    document.getElementById('challengeModal').classList.remove('active');
+    currentChallenge = null;
+}
+
+function completeChallenge() {
+    const player = currentSession.players.find(p => p.username === currentUser.username);
+    const challenge = player.challenges.find(c => c.id === currentChallenge.id);
+
+    // In a real app, you would validate the completion (check photo, QR code, etc.)
+    challenge.completed = true;
+    player.points += challenge.points;
+
+    currentUser.totalPoints += challenge.points;
+    currentUser.completedChallenges++;
+
+    closeChallengeModal();
+    loadChallenges();
+
+    alert(`Čestitke! Pridobili ste ${challenge.points} točk! 🎉`);
+}
+
+// Groups
+function loadMyGroups() {
+    const myGroupsList = document.getElementById('myGroupsList');
+    myGroupsList.innerHTML = '';
+
+    const userGroups = groups.filter(g => g.members.includes(currentUser.username));
+
+    if (userGroups.length === 0) {
+        myGroupsList.innerHTML = '<div class="empty-state"><div class="empty-state-icon">👥</div><p>Niste član nobene skupine</p></div>';
+        return;
+    }
+
+    userGroups.forEach(group => {
+        const card = document.createElement('div');
+        card.className = 'group-card';
+        card.innerHTML = `
+            <h4>${group.name}</h4>
+            <p>${group.description}</p>
+            <p>👥 ${group.members.length} članov</p>
+            <p>👑 Lastnik: ${group.owner}</p>
+        `;
+        card.onclick = () => openGroupDetail(group.id);
+        myGroupsList.appendChild(card);
+    });
+}
+
+function searchGroups() {
+    const searchTerm = document.getElementById('groupSearchInput').value.toLowerCase().trim();
+    const searchResults = document.getElementById('searchResults');
+    searchResults.innerHTML = '';
+
+    if (!searchTerm) {
+        searchResults.innerHTML = '<div class="empty-state"><p>Vnesite iskalni pojem</p></div>';
+        return;
+    }
+
+    const results = groups.filter(g =>
+        g.name.toLowerCase().includes(searchTerm) ||
+        g.description.toLowerCase().includes(searchTerm)
+    );
+
+    if (results.length === 0) {
+        searchResults.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🔍</div><p>Ni rezultatov</p></div>';
+        return;
+    }
+
+    results.forEach(group => {
+        const card = document.createElement('div');
+        card.className = 'group-card';
+
+        const isMember = group.members.includes(currentUser.username);
+        const hasPendingRequest = group.requests.includes(currentUser.username);
+
+        card.innerHTML = `
+            <h4>${group.name}</h4>
+            <p>${group.description}</p>
+            <p>👥 ${group.members.length} članov</p>
+            <p>👑 Lastnik: ${group.owner}</p>
+            <div class="group-actions">
+                ${isMember ? '<span style="color: green;">✅ Član</span>' :
+                  hasPendingRequest ? '<span style="color: orange;">⏳ Prošnja poslana</span>' :
+                  `<button class="btn-primary" onclick="requestJoinGroup(${group.id}, event)">Pridruži se</button>`}
+            </div>
+        `;
+        searchResults.appendChild(card);
+    });
+}
+
+function requestJoinGroup(groupId, event) {
+    event.stopPropagation();
+
+    const group = groups.find(g => g.id === groupId);
+    if (!group.requests) {
+        group.requests = [];
+    }
+
+    if (!group.requests.includes(currentUser.username)) {
+        group.requests.push(currentUser.username);
+        alert('Prošnja za pridružitev poslana!');
+        searchGroups();
+    }
+}
+
+function loadGroupRequests() {
+    const requestsList = document.getElementById('groupRequestsList');
+    requestsList.innerHTML = '';
+
+    const myGroups = groups.filter(g => g.owner === currentUser.username);
+    let allRequests = [];
+
+    myGroups.forEach(group => {
+        if (group.requests && group.requests.length > 0) {
+            group.requests.forEach(username => {
+                allRequests.push({ group, username });
+            });
+        }
+    });
+
+    if (allRequests.length === 0) {
+        requestsList.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📬</div><p>Ni prošenj za pridružitev</p></div>';
+        return;
+    }
+
+    allRequests.forEach(req => {
+        const card = document.createElement('div');
+        card.className = 'request-card';
+        card.innerHTML = `
+            <div class="request-info">
+                <strong>${req.username}</strong> želi vstopiti v <strong>${req.group.name}</strong>
+            </div>
+            <div class="request-actions">
+                <button class="btn-primary" onclick="acceptGroupRequest('${req.group.id}', '${req.username}')">Sprejmi</button>
+                <button class="btn-secondary" onclick="rejectGroupRequest('${req.group.id}', '${req.username}')">Zavrni</button>
+            </div>
+        `;
+        requestsList.appendChild(card);
+    });
+}
+
+function acceptGroupRequest(groupId, username) {
+    const group = groups.find(g => g.id == groupId);
+    group.members.push(username);
+    group.requests = group.requests.filter(u => u !== username);
+
+    alert(`${username} je bil dodan v skupino!`);
+    loadGroupRequests();
+}
+
+function rejectGroupRequest(groupId, username) {
+    const group = groups.find(g => g.id == groupId);
+    group.requests = group.requests.filter(u => u !== username);
+
+    alert('Prošnja zavrnjena');
+    loadGroupRequests();
+}
+
+function openGroupDetail(groupId) {
+    const group = groups.find(g => g.id === groupId);
+    currentGroupId = groupId;
+
+    document.getElementById('groupDetailName').textContent = group.name;
+    document.getElementById('groupOwner').textContent = group.owner;
+    document.getElementById('groupMemberCount').textContent = group.members.length;
+    document.getElementById('groupDescription').textContent = group.description;
+
+    const membersList = document.getElementById('groupMembersList');
+    membersList.innerHTML = '';
+
+    group.members.forEach(member => {
+        const card = document.createElement('div');
+        card.className = 'member-card';
+        card.innerHTML = `
+            <div>${member} ${member === group.owner ? '👑' : ''}</div>
+            ${!currentUser.friends.includes(member) && member !== currentUser.username ?
+                `<button class="btn-secondary" onclick="sendFriendRequest('${member}', event)">Dodaj prijatelja</button>` :
+                member !== currentUser.username ? '<span style="color: green;">✅ Prijatelj</span>' : ''}
+        `;
+        membersList.appendChild(card);
+    });
+
+    // Show admin actions if current user is owner
+    if (group.owner === currentUser.username) {
+        document.getElementById('groupAdminActions').style.display = 'block';
+    } else {
+        document.getElementById('groupAdminActions').style.display = 'none';
+    }
+
+    showScreen('groupDetailScreen');
+}
+
+function showCreateGroupModal() {
+    document.getElementById('createGroupModal').classList.add('active');
+}
+
+function closeCreateGroupModal() {
+    document.getElementById('createGroupModal').classList.remove('active');
+    document.getElementById('newGroupName').value = '';
+    document.getElementById('newGroupDescription').value = '';
+}
+
+function createGroup() {
+    const name = document.getElementById('newGroupName').value.trim();
+    const description = document.getElementById('newGroupDescription').value.trim();
+
+    if (!name) {
+        alert('Prosim vnesite ime skupine');
+        return;
+    }
+
+    const newGroup = {
+        id: groups.length + 1,
+        name: name,
+        description: description,
+        owner: currentUser.username,
+        members: [currentUser.username],
+        requests: []
+    };
+
+    groups.push(newGroup);
+    closeCreateGroupModal();
+    loadMyGroups();
+    alert('Skupina ustvarjena!');
+}
+
+function inviteFriendsToGroup() {
+    const group = groups.find(g => g.id === currentGroupId);
+    const friendsToInviteList = document.getElementById('friendsToInviteList');
+    friendsToInviteList.innerHTML = '';
+
+    const availableFriends = currentUser.friends.filter(f => !group.members.includes(f));
+
+    if (availableFriends.length === 0) {
+        friendsToInviteList.innerHTML = '<div class="empty-state"><p>Vsi prijatelji so že člani skupine</p></div>';
+    } else {
+        availableFriends.forEach(friend => {
+            const card = document.createElement('div');
+            card.className = 'friend-card';
+            card.innerHTML = `
+                <div class="friend-name">${friend}</div>
+                <button class="btn-primary" onclick="inviteFriendToGroup('${friend}')">Povabi</button>
+            `;
+            friendsToInviteList.appendChild(card);
+        });
+    }
+
+    document.getElementById('inviteFriendsModal').classList.add('active');
+}
+
+function closeInviteFriendsModal() {
+    document.getElementById('inviteFriendsModal').classList.remove('active');
+}
+
+function inviteFriendToGroup(friendUsername) {
+    const group = groups.find(g => g.id === currentGroupId);
+
+    // In a real app, this would send a notification to the friend
+    group.members.push(friendUsername);
+    alert(`${friendUsername} je bil povabljen v skupino!`);
+
+    closeInviteFriendsModal();
+    openGroupDetail(currentGroupId);
+}
+
+// Friends
+function loadFriends() {
+    const friendsList = document.getElementById('friendsList');
+    friendsList.innerHTML = '';
+
+    if (currentUser.friends.length === 0) {
+        friendsList.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🤝</div><p>Nimate še prijateljev</p></div>';
+        return;
+    }
+
+    currentUser.friends.forEach(friend => {
+        const card = document.createElement('div');
+        card.className = 'friend-card';
+        card.innerHTML = `
+            <div class="friend-name">${friend}</div>
+            <button class="btn-secondary" onclick="removeFriend('${friend}')">Odstrani</button>
+        `;
+        friendsList.appendChild(card);
+    });
+}
+
+function loadFriendRequests() {
+    // Received requests
+    const requestsList = document.getElementById('friendRequestsList');
+    requestsList.innerHTML = '';
+
+    if (currentUser.friendRequests.length === 0) {
+        requestsList.innerHTML = '<div class="empty-state"><p>Ni novih prošenj</p></div>';
+    } else {
+        currentUser.friendRequests.forEach(username => {
+            const card = document.createElement('div');
+            card.className = 'request-card';
+            card.innerHTML = `
+                <div class="request-info">
+                    <strong>${username}</strong> vam želi postati prijatelj
+                </div>
+                <div class="request-actions">
+                    <button class="btn-primary" onclick="acceptFriendRequest('${username}')">Sprejmi</button>
+                    <button class="btn-secondary" onclick="rejectFriendRequest('${username}')">Zavrni</button>
+                </div>
+            `;
+            requestsList.appendChild(card);
+        });
+    }
+
+    // Sent requests
+    const sentRequestsList = document.getElementById('sentRequestsList');
+    sentRequestsList.innerHTML = '';
+
+    if (currentUser.sentRequests.length === 0) {
+        sentRequestsList.innerHTML = '<div class="empty-state"><p>Niste poslali nobene prošnje</p></div>';
+    } else {
+        currentUser.sentRequests.forEach(username => {
+            const card = document.createElement('div');
+            card.className = 'request-card';
+            card.innerHTML = `
+                <div class="request-info">
+                    Prošnja poslana: <strong>${username}</strong>
+                </div>
+                <div class="request-actions">
+                    <button class="btn-secondary" onclick="cancelFriendRequest('${username}')">Prekliči</button>
+                </div>
+            `;
+            sentRequestsList.appendChild(card);
+        });
+    }
+}
+
+function searchUsers() {
+    const searchTerm = document.getElementById('friendSearchInput').value.toLowerCase().trim();
+    const searchResults = document.getElementById('userSearchResults');
+    searchResults.innerHTML = '';
+
+    if (!searchTerm) {
+        searchResults.innerHTML = '<div class="empty-state"><p>Vnesite iskalni pojem</p></div>';
+        return;
+    }
+
+    const results = users.filter(u =>
+        u.username.toLowerCase().includes(searchTerm) &&
+        u.username !== currentUser.username
+    );
+
+    if (results.length === 0) {
+        searchResults.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🔍</div><p>Ni rezultatov</p></div>';
+        return;
+    }
+
+    results.forEach(user => {
+        const card = document.createElement('div');
+        card.className = 'user-card';
+
+        const isFriend = currentUser.friends.includes(user.username);
+        const hasPendingRequest = currentUser.sentRequests.includes(user.username);
+
+        card.innerHTML = `
+            <div class="user-name">${user.username}</div>
+            ${isFriend ? '<span style="color: green;">✅ Prijatelj</span>' :
+              hasPendingRequest ? '<span style="color: orange;">⏳ Prošnja poslana</span>' :
+              `<button class="btn-primary" onclick="sendFriendRequest('${user.username}', event)">Dodaj prijatelja</button>`}
+        `;
+        searchResults.appendChild(card);
+    });
+}
+
+function sendFriendRequest(username, event) {
+    if (event) event.stopPropagation();
+
+    const targetUser = users.find(u => u.username === username);
+
+    if (!currentUser.sentRequests.includes(username)) {
+        currentUser.sentRequests.push(username);
+        targetUser.friendRequests.push(currentUser.username);
+        alert('Prošnja za prijateljstvo poslana!');
+
+        // Refresh current view
+        if (document.getElementById('userSearchResults').innerHTML) {
+            searchUsers();
+        }
+    }
+}
+
+function acceptFriendRequest(username) {
+    currentUser.friends.push(username);
+    currentUser.friendRequests = currentUser.friendRequests.filter(u => u !== username);
+
+    const otherUser = users.find(u => u.username === username);
+    otherUser.friends.push(currentUser.username);
+    otherUser.sentRequests = otherUser.sentRequests.filter(u => u !== currentUser.username);
+
+    alert(`${username} je sedaj vaš prijatelj!`);
+    loadFriendRequests();
+}
+
+function rejectFriendRequest(username) {
+    currentUser.friendRequests = currentUser.friendRequests.filter(u => u !== username);
+
+    const otherUser = users.find(u => u.username === username);
+    otherUser.sentRequests = otherUser.sentRequests.filter(u => u !== currentUser.username);
+
+    alert('Prošnja zavrnjena');
+    loadFriendRequests();
+}
+
+function cancelFriendRequest(username) {
+    currentUser.sentRequests = currentUser.sentRequests.filter(u => u !== username);
+
+    const otherUser = users.find(u => u.username === username);
+    otherUser.friendRequests = otherUser.friendRequests.filter(u => u !== currentUser.username);
+
+    alert('Prošnja preklicana');
+    loadFriendRequests();
+}
+
+function removeFriend(username) {
+    if (confirm(`Ali ste prepričani, da želite odstraniti ${username} iz prijateljev?`)) {
+        currentUser.friends = currentUser.friends.filter(f => f !== username);
+
+        const otherUser = users.find(u => u.username === username);
+        otherUser.friends = otherUser.friends.filter(f => f !== currentUser.username);
+
+        loadFriends();
+        alert('Prijatelj odstranjen');
+    }
+}
+
+// Leaderboard
+function loadGlobalLeaderboard() {
+    const leaderboard = document.getElementById('globalLeaderboard');
+    leaderboard.innerHTML = '';
+
+    const sortedUsers = [...users].sort((a, b) => b.totalPoints - a.totalPoints);
+
+    if (sortedUsers.length === 0) {
+        leaderboard.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🏆</div><p>Še ni uporabnikov</p></div>';
+        return;
+    }
+
+    sortedUsers.forEach((user, index) => {
+        const item = document.createElement('div');
+        item.className = 'leaderboard-item';
+
+        let rankClass = '';
+        if (index === 0) rankClass = 'gold';
+        else if (index === 1) rankClass = 'silver';
+        else if (index === 2) rankClass = 'bronze';
+
+        item.innerHTML = `
+            <div class="leaderboard-rank ${rankClass}">${index + 1}</div>
+            <div class="leaderboard-name">${user.username}</div>
+            <div class="leaderboard-points">${user.totalPoints}</div>
+        `;
+        leaderboard.appendChild(item);
+    });
+}
+
+// Profile
+function loadProfile() {
+    document.getElementById('profileUsername').textContent = currentUser.username;
+    document.getElementById('profileTotalPoints').textContent = currentUser.totalPoints;
+    document.getElementById('profileCompletedChallenges').textContent = currentUser.completedChallenges;
+}
+
+// Initialize app
+window.onload = function() {
+    showScreen('loginScreen');
+};
