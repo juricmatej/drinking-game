@@ -13,7 +13,7 @@ let groups = [
     {
         id: 1,
         name: 'Nocturnal Crew',
-        description: 'Skupina za vikend zabavo',
+        description: 'Weekend party group',
         owner: 'demo',
         members: ['demo'],
         requests: []
@@ -23,7 +23,7 @@ let groups = [
 let sessions = [
     {
         id: 1,
-        name: 'Petkov večer @ Club XYZ',
+        name: 'Friday Night @ Club XYZ',
         location: 'Club XYZ',
         date: '2025-12-12',
         active: true,
@@ -31,8 +31,8 @@ let sessions = [
     },
     {
         id: 2,
-        name: 'Sobotna zabava @ Diskoteka 90',
-        location: 'Diskoteka 90',
+        name: 'Saturday Party @ Disco 90',
+        location: 'Disco 90',
         date: '2025-12-13',
         active: true,
         players: []
@@ -40,14 +40,14 @@ let sessions = [
 ];
 
 let challenges = [
-    { id: 1, title: 'Kupi pijačo za nekoga v rdeči jopici', description: 'Najdi osebo v rdeči obleki in ji kupi pijačo', points: 50, type: 'photo', completed: false },
-    { id: 2, title: 'Selfie z DJ-jem', description: 'Naredi selfie s DJ-jem', points: 100, type: 'photo', completed: false },
-    { id: 3, title: 'Nazdravite z neznancem', description: 'Najdi neznanko/neznavca in nazdravite', points: 30, type: 'user_confirm', completed: false },
-    { id: 4, title: 'Skeniraj QR kodo pri baru', description: 'Najdi QR kodo pri glavnem baru', points: 20, type: 'qr', completed: false },
-    { id: 5, title: 'Zaplesaj pred sceno', description: 'Pokaži svoje plesne spretnosti', points: 40, type: 'photo', completed: false },
-    { id: 6, title: 'Povej DJ-ju song request', description: 'Predlagaj pesem DJ-ju', points: 25, type: 'user_confirm', completed: false },
-    { id: 7, title: 'Spoznaj 3 nove ljudi', description: 'Predstavi se trem novim ljudem', points: 75, type: 'user_confirm', completed: false },
-    { id: 8, title: 'Fotografija z bartenderjem', description: 'Naredi fotografijo z bartenderjem', points: 35, type: 'photo', completed: false }
+    { id: 1, title: 'Buy a drink for someone in a red jacket', description: 'Find someone in red and buy them a drink', points: 50, type: 'photo', completed: false },
+    { id: 2, title: 'Selfie with the DJ', description: 'Take a selfie with the DJ', points: 100, type: 'photo', completed: false },
+    { id: 3, title: 'Toast with a stranger', description: 'Find a stranger and toast together', points: 30, type: 'user_confirm', completed: false },
+    { id: 4, title: 'Scan QR code at the bar', description: 'Find the QR code at the main bar', points: 20, type: 'qr', completed: false },
+    { id: 5, title: 'Dance in front of the stage', description: 'Show off your dance moves', points: 40, type: 'photo', completed: false },
+    { id: 6, title: 'Make a song request to the DJ', description: 'Suggest a song to the DJ', points: 25, type: 'user_confirm', completed: false },
+    { id: 7, title: 'Meet 3 new people', description: 'Introduce yourself to three new people', points: 75, type: 'user_confirm', completed: false },
+    { id: 8, title: 'Photo with the bartender', description: 'Take a photo with the bartender', points: 35, type: 'photo', completed: false }
 ];
 
 // Utility functions
@@ -134,7 +134,7 @@ function switchFriendTab(tabName) {
 function login() {
     const username = document.getElementById('usernameInput').value.trim();
     if (!username) {
-        alert('Prosim vnesite uporabniško ime');
+        alert('Please enter a username');
         return;
     }
 
@@ -172,7 +172,7 @@ function loadSessions() {
     sessionsList.innerHTML = '';
 
     if (sessions.length === 0) {
-        sessionsList.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🎯</div><p>Trenutno ni aktivnih sej</p></div>';
+        sessionsList.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🎯</div><p>No active sessions available</p></div>';
         return;
     }
 
@@ -183,7 +183,7 @@ function loadSessions() {
             <h3>${session.name}</h3>
             <p>📍 ${session.location}</p>
             <p>📅 ${session.date}</p>
-            <p>👥 ${session.players.length} igralcev</p>
+            <p>👥 ${session.players.length} players</p>
         `;
         card.onclick = () => joinSession(session);
         sessionsList.appendChild(card);
@@ -221,7 +221,7 @@ function loadChallenges() {
                 <h4>${challenge.completed ? '✅ ' : ''}${challenge.title}</h4>
                 <p>${challenge.description}</p>
             </div>
-            <div class="challenge-points">${challenge.points} točk</div>
+            <div class="challenge-points">${challenge.points} pts</div>
         `;
         if (!challenge.completed) {
             card.onclick = () => openChallengeModal(challenge);
@@ -237,7 +237,7 @@ function updateLiveLeaderboard() {
     const sortedPlayers = [...currentSession.players].sort((a, b) => b.points - a.points);
 
     if (sortedPlayers.length === 0) {
-        leaderboard.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🏆</div><p>Še ni igralcev</p></div>';
+        leaderboard.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🏆</div><p>No players yet</p></div>';
         return;
     }
 
@@ -303,7 +303,7 @@ function completeChallenge() {
     closeChallengeModal();
     loadChallenges();
 
-    alert(`Čestitke! Pridobili ste ${challenge.points} točk! 🎉`);
+    alert(`Congratulations! You earned ${challenge.points} points! 🎉`);
 }
 
 // Groups
@@ -314,7 +314,7 @@ function loadMyGroups() {
     const userGroups = groups.filter(g => g.members.includes(currentUser.username));
 
     if (userGroups.length === 0) {
-        myGroupsList.innerHTML = '<div class="empty-state"><div class="empty-state-icon">👥</div><p>Niste član nobene skupine</p></div>';
+        myGroupsList.innerHTML = '<div class="empty-state"><div class="empty-state-icon">👥</div><p>You are not a member of any group</p></div>';
         return;
     }
 
@@ -324,8 +324,8 @@ function loadMyGroups() {
         card.innerHTML = `
             <h4>${group.name}</h4>
             <p>${group.description}</p>
-            <p>👥 ${group.members.length} članov</p>
-            <p>👑 Lastnik: ${group.owner}</p>
+            <p>👥 ${group.members.length} members</p>
+            <p>👑 Owner: ${group.owner}</p>
         `;
         card.onclick = () => openGroupDetail(group.id);
         myGroupsList.appendChild(card);
@@ -338,7 +338,7 @@ function searchGroups() {
     searchResults.innerHTML = '';
 
     if (!searchTerm) {
-        searchResults.innerHTML = '<div class="empty-state"><p>Vnesite iskalni pojem</p></div>';
+        searchResults.innerHTML = '<div class="empty-state"><p>Enter a search term</p></div>';
         return;
     }
 
@@ -348,7 +348,7 @@ function searchGroups() {
     );
 
     if (results.length === 0) {
-        searchResults.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🔍</div><p>Ni rezultatov</p></div>';
+        searchResults.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🔍</div><p>No results found</p></div>';
         return;
     }
 
@@ -362,12 +362,12 @@ function searchGroups() {
         card.innerHTML = `
             <h4>${group.name}</h4>
             <p>${group.description}</p>
-            <p>👥 ${group.members.length} članov</p>
-            <p>👑 Lastnik: ${group.owner}</p>
+            <p>👥 ${group.members.length} members</p>
+            <p>👑 Owner: ${group.owner}</p>
             <div class="group-actions">
-                ${isMember ? '<span style="color: green;">✅ Član</span>' :
-                  hasPendingRequest ? '<span style="color: orange;">⏳ Prošnja poslana</span>' :
-                  `<button class="btn-primary" onclick="requestJoinGroup(${group.id}, event)">Pridruži se</button>`}
+                ${isMember ? '<span style="color: green;">✅ Member</span>' :
+                  hasPendingRequest ? '<span style="color: orange;">⏳ Request sent</span>' :
+                  `<button class="btn-primary" onclick="requestJoinGroup(${group.id}, event)">Join</button>`}
             </div>
         `;
         searchResults.appendChild(card);
@@ -384,7 +384,7 @@ function requestJoinGroup(groupId, event) {
 
     if (!group.requests.includes(currentUser.username)) {
         group.requests.push(currentUser.username);
-        alert('Prošnja za pridružitev poslana!');
+        alert('Join request sent!');
         searchGroups();
     }
 }
@@ -405,7 +405,7 @@ function loadGroupRequests() {
     });
 
     if (allRequests.length === 0) {
-        requestsList.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📬</div><p>Ni prošenj za pridružitev</p></div>';
+        requestsList.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📬</div><p>No join requests</p></div>';
         return;
     }
 
@@ -414,11 +414,11 @@ function loadGroupRequests() {
         card.className = 'request-card';
         card.innerHTML = `
             <div class="request-info">
-                <strong>${req.username}</strong> želi vstopiti v <strong>${req.group.name}</strong>
+                <strong>${req.username}</strong> wants to join <strong>${req.group.name}</strong>
             </div>
             <div class="request-actions">
-                <button class="btn-primary" onclick="acceptGroupRequest('${req.group.id}', '${req.username}')">Sprejmi</button>
-                <button class="btn-secondary" onclick="rejectGroupRequest('${req.group.id}', '${req.username}')">Zavrni</button>
+                <button class="btn-primary" onclick="acceptGroupRequest('${req.group.id}', '${req.username}')">Accept</button>
+                <button class="btn-secondary" onclick="rejectGroupRequest('${req.group.id}', '${req.username}')">Reject</button>
             </div>
         `;
         requestsList.appendChild(card);
@@ -430,7 +430,7 @@ function acceptGroupRequest(groupId, username) {
     group.members.push(username);
     group.requests = group.requests.filter(u => u !== username);
 
-    alert(`${username} je bil dodan v skupino!`);
+    alert(`${username} has been added to the group!`);
     loadGroupRequests();
 }
 
@@ -438,7 +438,7 @@ function rejectGroupRequest(groupId, username) {
     const group = groups.find(g => g.id == groupId);
     group.requests = group.requests.filter(u => u !== username);
 
-    alert('Prošnja zavrnjena');
+    alert('Request rejected');
     loadGroupRequests();
 }
 
@@ -460,8 +460,8 @@ function openGroupDetail(groupId) {
         card.innerHTML = `
             <div>${member} ${member === group.owner ? '👑' : ''}</div>
             ${!currentUser.friends.includes(member) && member !== currentUser.username ?
-                `<button class="btn-secondary" onclick="sendFriendRequest('${member}', event)">Dodaj prijatelja</button>` :
-                member !== currentUser.username ? '<span style="color: green;">✅ Prijatelj</span>' : ''}
+                `<button class="btn-secondary" onclick="sendFriendRequest('${member}', event)">Add Friend</button>` :
+                member !== currentUser.username ? '<span style="color: green;">✅ Friend</span>' : ''}
         `;
         membersList.appendChild(card);
     });
@@ -491,7 +491,7 @@ function createGroup() {
     const description = document.getElementById('newGroupDescription').value.trim();
 
     if (!name) {
-        alert('Prosim vnesite ime skupine');
+        alert('Please enter a group name');
         return;
     }
 
@@ -507,7 +507,7 @@ function createGroup() {
     groups.push(newGroup);
     closeCreateGroupModal();
     loadMyGroups();
-    alert('Skupina ustvarjena!');
+    alert('Group created!');
 }
 
 function inviteFriendsToGroup() {
@@ -518,14 +518,14 @@ function inviteFriendsToGroup() {
     const availableFriends = currentUser.friends.filter(f => !group.members.includes(f));
 
     if (availableFriends.length === 0) {
-        friendsToInviteList.innerHTML = '<div class="empty-state"><p>Vsi prijatelji so že člani skupine</p></div>';
+        friendsToInviteList.innerHTML = '<div class="empty-state"><p>All friends are already members of the group</p></div>';
     } else {
         availableFriends.forEach(friend => {
             const card = document.createElement('div');
             card.className = 'friend-card';
             card.innerHTML = `
                 <div class="friend-name">${friend}</div>
-                <button class="btn-primary" onclick="inviteFriendToGroup('${friend}')">Povabi</button>
+                <button class="btn-primary" onclick="inviteFriendToGroup('${friend}')">Invite</button>
             `;
             friendsToInviteList.appendChild(card);
         });
@@ -543,7 +543,7 @@ function inviteFriendToGroup(friendUsername) {
 
     // In a real app, this would send a notification to the friend
     group.members.push(friendUsername);
-    alert(`${friendUsername} je bil povabljen v skupino!`);
+    alert(`${friendUsername} has been invited to the group!`);
 
     closeInviteFriendsModal();
     openGroupDetail(currentGroupId);
@@ -555,7 +555,7 @@ function loadFriends() {
     friendsList.innerHTML = '';
 
     if (currentUser.friends.length === 0) {
-        friendsList.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🤝</div><p>Nimate še prijateljev</p></div>';
+        friendsList.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🤝</div><p>You have no friends yet</p></div>';
         return;
     }
 
@@ -564,7 +564,7 @@ function loadFriends() {
         card.className = 'friend-card';
         card.innerHTML = `
             <div class="friend-name">${friend}</div>
-            <button class="btn-secondary" onclick="removeFriend('${friend}')">Odstrani</button>
+            <button class="btn-secondary" onclick="removeFriend('${friend}')">Remove</button>
         `;
         friendsList.appendChild(card);
     });
@@ -576,18 +576,18 @@ function loadFriendRequests() {
     requestsList.innerHTML = '';
 
     if (currentUser.friendRequests.length === 0) {
-        requestsList.innerHTML = '<div class="empty-state"><p>Ni novih prošenj</p></div>';
+        requestsList.innerHTML = '<div class="empty-state"><p>No new requests</p></div>';
     } else {
         currentUser.friendRequests.forEach(username => {
             const card = document.createElement('div');
             card.className = 'request-card';
             card.innerHTML = `
                 <div class="request-info">
-                    <strong>${username}</strong> vam želi postati prijatelj
+                    <strong>${username}</strong> wants to be your friend
                 </div>
                 <div class="request-actions">
-                    <button class="btn-primary" onclick="acceptFriendRequest('${username}')">Sprejmi</button>
-                    <button class="btn-secondary" onclick="rejectFriendRequest('${username}')">Zavrni</button>
+                    <button class="btn-primary" onclick="acceptFriendRequest('${username}')">Accept</button>
+                    <button class="btn-secondary" onclick="rejectFriendRequest('${username}')">Reject</button>
                 </div>
             `;
             requestsList.appendChild(card);
@@ -599,17 +599,17 @@ function loadFriendRequests() {
     sentRequestsList.innerHTML = '';
 
     if (currentUser.sentRequests.length === 0) {
-        sentRequestsList.innerHTML = '<div class="empty-state"><p>Niste poslali nobene prošnje</p></div>';
+        sentRequestsList.innerHTML = '<div class="empty-state"><p>You have not sent any requests</p></div>';
     } else {
         currentUser.sentRequests.forEach(username => {
             const card = document.createElement('div');
             card.className = 'request-card';
             card.innerHTML = `
                 <div class="request-info">
-                    Prošnja poslana: <strong>${username}</strong>
+                    Request sent to: <strong>${username}</strong>
                 </div>
                 <div class="request-actions">
-                    <button class="btn-secondary" onclick="cancelFriendRequest('${username}')">Prekliči</button>
+                    <button class="btn-secondary" onclick="cancelFriendRequest('${username}')">Cancel</button>
                 </div>
             `;
             sentRequestsList.appendChild(card);
@@ -623,7 +623,7 @@ function searchUsers() {
     searchResults.innerHTML = '';
 
     if (!searchTerm) {
-        searchResults.innerHTML = '<div class="empty-state"><p>Vnesite iskalni pojem</p></div>';
+        searchResults.innerHTML = '<div class="empty-state"><p>Enter a search term</p></div>';
         return;
     }
 
@@ -633,7 +633,7 @@ function searchUsers() {
     );
 
     if (results.length === 0) {
-        searchResults.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🔍</div><p>Ni rezultatov</p></div>';
+        searchResults.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🔍</div><p>No results found</p></div>';
         return;
     }
 
@@ -646,9 +646,9 @@ function searchUsers() {
 
         card.innerHTML = `
             <div class="user-name">${user.username}</div>
-            ${isFriend ? '<span style="color: green;">✅ Prijatelj</span>' :
-              hasPendingRequest ? '<span style="color: orange;">⏳ Prošnja poslana</span>' :
-              `<button class="btn-primary" onclick="sendFriendRequest('${user.username}', event)">Dodaj prijatelja</button>`}
+            ${isFriend ? '<span style="color: green;">✅ Friend</span>' :
+              hasPendingRequest ? '<span style="color: orange;">⏳ Request sent</span>' :
+              `<button class="btn-primary" onclick="sendFriendRequest('${user.username}', event)">Add Friend</button>`}
         `;
         searchResults.appendChild(card);
     });
@@ -662,7 +662,7 @@ function sendFriendRequest(username, event) {
     if (!currentUser.sentRequests.includes(username)) {
         currentUser.sentRequests.push(username);
         targetUser.friendRequests.push(currentUser.username);
-        alert('Prošnja za prijateljstvo poslana!');
+        alert('Friend request sent!');
 
         // Refresh current view
         if (document.getElementById('userSearchResults').innerHTML) {
@@ -679,7 +679,7 @@ function acceptFriendRequest(username) {
     otherUser.friends.push(currentUser.username);
     otherUser.sentRequests = otherUser.sentRequests.filter(u => u !== currentUser.username);
 
-    alert(`${username} je sedaj vaš prijatelj!`);
+    alert(`${username} is now your friend!`);
     loadFriendRequests();
 }
 
@@ -689,7 +689,7 @@ function rejectFriendRequest(username) {
     const otherUser = users.find(u => u.username === username);
     otherUser.sentRequests = otherUser.sentRequests.filter(u => u !== currentUser.username);
 
-    alert('Prošnja zavrnjena');
+    alert('Request rejected');
     loadFriendRequests();
 }
 
@@ -699,19 +699,19 @@ function cancelFriendRequest(username) {
     const otherUser = users.find(u => u.username === username);
     otherUser.friendRequests = otherUser.friendRequests.filter(u => u !== currentUser.username);
 
-    alert('Prošnja preklicana');
+    alert('Request cancelled');
     loadFriendRequests();
 }
 
 function removeFriend(username) {
-    if (confirm(`Ali ste prepričani, da želite odstraniti ${username} iz prijateljev?`)) {
+    if (confirm(`Are you sure you want to remove ${username} from your friends?`)) {
         currentUser.friends = currentUser.friends.filter(f => f !== username);
 
         const otherUser = users.find(u => u.username === username);
         otherUser.friends = otherUser.friends.filter(f => f !== currentUser.username);
 
         loadFriends();
-        alert('Prijatelj odstranjen');
+        alert('Friend removed');
     }
 }
 
@@ -723,7 +723,7 @@ function loadGlobalLeaderboard() {
     const sortedUsers = [...users].sort((a, b) => b.totalPoints - a.totalPoints);
 
     if (sortedUsers.length === 0) {
-        leaderboard.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🏆</div><p>Še ni uporabnikov</p></div>';
+        leaderboard.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🏆</div><p>No users yet</p></div>';
         return;
     }
 

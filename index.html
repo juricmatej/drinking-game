@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="sl">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#667eea">
-    <title>ClubQuest - Nočni Izzivi</title>
+    <title>ClubQuest - Night Challenges</title>
     <link rel="stylesheet" href="styles.css">
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -20,14 +20,14 @@
                     <i class="fas fa-champagne-glasses logo-icon"></i>
                     <h1>ClubQuest</h1>
                 </div>
-                <p class="tagline">Spremeni noč v pustolovščino</p>
+                <p class="tagline">Turn your night into an adventure</p>
                 <div class="login-form">
                     <div class="input-group">
                         <i class="fas fa-user"></i>
-                        <input type="text" id="usernameInput" placeholder="Uporabniško ime">
+                        <input type="text" id="usernameInput" placeholder="Username">
                     </div>
                     <button onclick="login()" class="btn-primary">
-                        <i class="fas fa-sign-in-alt"></i> Vstopi
+                        <i class="fas fa-sign-in-alt"></i> Enter
                     </button>
                 </div>
             </div>
@@ -53,16 +53,16 @@
         </div>
         <div class="container">
             <div class="welcome-banner">
-                <h3>Dobrodošli nazaj! 👋</h3>
-                <p>Izberite možnost za začetek</p>
+                <h3>Welcome back! 👋</h3>
+                <p>Choose an option to get started</p>
             </div>
             <div class="menu-grid">
                 <div class="menu-card" onclick="showScreen('sessionScreen')">
                     <div class="icon-wrapper purple">
                         <i class="fas fa-bullseye fa-3x"></i>
                     </div>
-                    <h3>Pridruži se večeru</h3>
-                    <p>Vstopi v aktivno sejo in začni z izzivi</p>
+                    <h3>Join the Night</h3>
+                    <p>Enter an active session and start challenges</p>
                     <div class="card-footer">
                         <i class="fas fa-arrow-right"></i>
                     </div>
@@ -71,8 +71,8 @@
                     <div class="icon-wrapper blue">
                         <i class="fas fa-users fa-3x"></i>
                     </div>
-                    <h3>Skupine</h3>
-                    <p>Ustvari ali se pridruži skupini</p>
+                    <h3>Groups</h3>
+                    <p>Create or join a group</p>
                     <div class="card-footer">
                         <i class="fas fa-arrow-right"></i>
                     </div>
@@ -81,8 +81,8 @@
                     <div class="icon-wrapper green">
                         <i class="fas fa-user-friends fa-3x"></i>
                     </div>
-                    <h3>Prijatelji</h3>
-                    <p>Upravljaj s prijatelji in vabili</p>
+                    <h3>Friends</h3>
+                    <p>Manage friends and invitations</p>
                     <div class="card-footer">
                         <i class="fas fa-arrow-right"></i>
                     </div>
@@ -91,8 +91,8 @@
                     <div class="icon-wrapper gold">
                         <i class="fas fa-trophy fa-3x"></i>
                     </div>
-                    <h3>Lestvica</h3>
-                    <p>Preveri najboljše igralce</p>
+                    <h3>Leaderboard</h3>
+                    <p>Check the top players</p>
                     <div class="card-footer">
                         <i class="fas fa-arrow-right"></i>
                     </div>
@@ -105,9 +105,9 @@
     <div id="sessionScreen" class="screen">
         <div class="header">
             <button onclick="showScreen('mainMenu')" class="btn-back">
-                <i class="fas fa-arrow-left"></i> Nazaj
+                <i class="fas fa-arrow-left"></i> Back
             </button>
-            <h2><i class="fas fa-calendar-alt"></i> Aktivne seje</h2>
+            <h2><i class="fas fa-calendar-alt"></i> Active Sessions</h2>
         </div>
         <div class="container">
             <div id="sessionsList" class="sessions-list"></div>
@@ -118,7 +118,7 @@
     <div id="gameScreen" class="screen">
         <div class="header">
             <button onclick="showScreen('sessionScreen')" class="btn-back">
-                <i class="fas fa-times"></i> Zapusti
+                <i class="fas fa-times"></i> Leave
             </button>
             <h2 id="sessionName"></h2>
             <div class="points">
@@ -129,23 +129,23 @@
         <div class="container">
             <div class="tabs">
                 <button class="tab active" onclick="switchTab('challenges')">
-                    <i class="fas fa-tasks"></i> Izzivi
+                    <i class="fas fa-tasks"></i> Challenges
                 </button>
                 <button class="tab" onclick="switchTab('live-leaderboard')">
-                    <i class="fas fa-trophy"></i> Lestvica
+                    <i class="fas fa-trophy"></i> Leaderboard
                 </button>
             </div>
 
             <div id="challengesTab" class="tab-content active">
                 <div class="section-header">
-                    <h3><i class="fas fa-clipboard-list"></i> Tvoji izzivi</h3>
+                    <h3><i class="fas fa-clipboard-list"></i> Your Challenges</h3>
                 </div>
                 <div id="challengesList" class="challenges-list"></div>
             </div>
 
             <div id="liveLeaderboardTab" class="tab-content">
                 <div class="section-header">
-                    <h3><i class="fas fa-medal"></i> Trenutna lestvica</h3>
+                    <h3><i class="fas fa-medal"></i> Current Leaderboard</h3>
                 </div>
                 <div id="liveLeaderboard" class="leaderboard"></div>
             </div>
@@ -156,26 +156,26 @@
     <div id="groupsScreen" class="screen">
         <div class="header">
             <button onclick="showScreen('mainMenu')" class="btn-back">
-                <i class="fas fa-arrow-left"></i> Nazaj
+                <i class="fas fa-arrow-left"></i> Back
             </button>
-            <h2><i class="fas fa-users"></i> Skupine</h2>
+            <h2><i class="fas fa-users"></i> Groups</h2>
         </div>
         <div class="container">
             <div class="tabs">
                 <button class="tab active" onclick="switchGroupTab('my-groups')">
-                    <i class="fas fa-user-shield"></i> Moje skupine
+                    <i class="fas fa-user-shield"></i> My Groups
                 </button>
                 <button class="tab" onclick="switchGroupTab('search-groups')">
-                    <i class="fas fa-search"></i> Išči
+                    <i class="fas fa-search"></i> Search
                 </button>
                 <button class="tab" onclick="switchGroupTab('requests')">
-                    <i class="fas fa-inbox"></i> Prošnje
+                    <i class="fas fa-inbox"></i> Requests
                 </button>
             </div>
 
             <div id="myGroupsTab" class="tab-content active">
                 <button onclick="showCreateGroupModal()" class="btn-primary btn-full">
-                    <i class="fas fa-plus-circle"></i> Ustvari novo skupino
+                    <i class="fas fa-plus-circle"></i> Create New Group
                 </button>
                 <div id="myGroupsList" class="groups-list"></div>
             </div>
@@ -183,9 +183,9 @@
             <div id="searchGroupsTab" class="tab-content">
                 <div class="search-box">
                     <i class="fas fa-search search-icon"></i>
-                    <input type="text" id="groupSearchInput" placeholder="Išči skupine...">
+                    <input type="text" id="groupSearchInput" placeholder="Search groups...">
                     <button onclick="searchGroups()" class="btn-primary">
-                        <i class="fas fa-search"></i> Išči
+                        <i class="fas fa-search"></i> Search
                     </button>
                 </div>
                 <div id="searchResults" class="groups-list"></div>
@@ -193,7 +193,7 @@
 
             <div id="requestsTab" class="tab-content">
                 <div class="section-header">
-                    <h3><i class="fas fa-bell"></i> Prošnje za pridružitev</h3>
+                    <h3><i class="fas fa-bell"></i> Join Requests</h3>
                 </div>
                 <div id="groupRequestsList" class="requests-list"></div>
             </div>
@@ -204,7 +204,7 @@
     <div id="groupDetailScreen" class="screen">
         <div class="header">
             <button onclick="showScreen('groupsScreen')" class="btn-back">
-                <i class="fas fa-arrow-left"></i> Nazaj
+                <i class="fas fa-arrow-left"></i> Back
             </button>
             <h2 id="groupDetailName"></h2>
         </div>
@@ -212,27 +212,27 @@
             <div class="group-info">
                 <div class="info-row">
                     <i class="fas fa-crown"></i>
-                    <strong>Lastnik:</strong> <span id="groupOwner"></span>
+                    <strong>Owner:</strong> <span id="groupOwner"></span>
                 </div>
                 <div class="info-row">
                     <i class="fas fa-users"></i>
-                    <strong>Članov:</strong> <span id="groupMemberCount"></span>
+                    <strong>Members:</strong> <span id="groupMemberCount"></span>
                 </div>
                 <div class="info-row">
                     <i class="fas fa-align-left"></i>
-                    <strong>Opis:</strong> <span id="groupDescription"></span>
+                    <strong>Description:</strong> <span id="groupDescription"></span>
                 </div>
             </div>
 
             <div class="section-header">
-                <h3><i class="fas fa-user-friends"></i> Člani skupine</h3>
+                <h3><i class="fas fa-user-friends"></i> Group Members</h3>
             </div>
             <div id="groupMembersList" class="members-list"></div>
 
             <div id="groupAdminActions" class="admin-actions" style="display:none;">
-                <h3><i class="fas fa-tools"></i> Akcije lastnika</h3>
+                <h3><i class="fas fa-tools"></i> Owner Actions</h3>
                 <button onclick="inviteFriendsToGroup()" class="btn-secondary">
-                    <i class="fas fa-user-plus"></i> Povabi prijatelje
+                    <i class="fas fa-user-plus"></i> Invite Friends
                 </button>
             </div>
         </div>
@@ -242,20 +242,20 @@
     <div id="friendsScreen" class="screen">
         <div class="header">
             <button onclick="showScreen('mainMenu')" class="btn-back">
-                <i class="fas fa-arrow-left"></i> Nazaj
+                <i class="fas fa-arrow-left"></i> Back
             </button>
-            <h2><i class="fas fa-user-friends"></i> Prijatelji</h2>
+            <h2><i class="fas fa-user-friends"></i> Friends</h2>
         </div>
         <div class="container">
             <div class="tabs">
                 <button class="tab active" onclick="switchFriendTab('friends-list')">
-                    <i class="fas fa-heart"></i> Prijatelji
+                    <i class="fas fa-heart"></i> Friends
                 </button>
                 <button class="tab" onclick="switchFriendTab('friend-requests')">
-                    <i class="fas fa-inbox"></i> Prošnje
+                    <i class="fas fa-inbox"></i> Requests
                 </button>
                 <button class="tab" onclick="switchFriendTab('find-friends')">
-                    <i class="fas fa-search"></i> Najdi
+                    <i class="fas fa-search"></i> Find
                 </button>
             </div>
 
@@ -265,11 +265,11 @@
 
             <div id="friendRequestsTab" class="tab-content">
                 <div class="section-header">
-                    <h3><i class="fas fa-envelope"></i> Prejete prošnje</h3>
+                    <h3><i class="fas fa-envelope"></i> Received Requests</h3>
                 </div>
                 <div id="friendRequestsList" class="requests-list"></div>
                 <div class="section-header">
-                    <h3><i class="fas fa-paper-plane"></i> Poslane prošnje</h3>
+                    <h3><i class="fas fa-paper-plane"></i> Sent Requests</h3>
                 </div>
                 <div id="sentRequestsList" class="requests-list"></div>
             </div>
@@ -277,9 +277,9 @@
             <div id="findFriendsTab" class="tab-content">
                 <div class="search-box">
                     <i class="fas fa-search search-icon"></i>
-                    <input type="text" id="friendSearchInput" placeholder="Išči uporabnike...">
+                    <input type="text" id="friendSearchInput" placeholder="Search users...">
                     <button onclick="searchUsers()" class="btn-primary">
-                        <i class="fas fa-search"></i> Išči
+                        <i class="fas fa-search"></i> Search
                     </button>
                 </div>
                 <div id="userSearchResults" class="users-list"></div>
@@ -291,13 +291,13 @@
     <div id="leaderboardScreen" class="screen">
         <div class="header">
             <button onclick="showScreen('mainMenu')" class="btn-back">
-                <i class="fas fa-arrow-left"></i> Nazaj
+                <i class="fas fa-arrow-left"></i> Back
             </button>
-            <h2><i class="fas fa-trophy"></i> Lestvica najboljših</h2>
+            <h2><i class="fas fa-trophy"></i> Top Players</h2>
         </div>
         <div class="container">
             <div class="section-header">
-                <h3><i class="fas fa-medal"></i> Globalna lestvica</h3>
+                <h3><i class="fas fa-medal"></i> Global Leaderboard</h3>
             </div>
             <div id="globalLeaderboard" class="leaderboard"></div>
         </div>
@@ -307,9 +307,9 @@
     <div id="profileScreen" class="screen">
         <div class="header">
             <button onclick="showScreen('mainMenu')" class="btn-back">
-                <i class="fas fa-arrow-left"></i> Nazaj
+                <i class="fas fa-arrow-left"></i> Back
             </button>
-            <h2><i class="fas fa-user"></i> Profil</h2>
+            <h2><i class="fas fa-user"></i> Profile</h2>
         </div>
         <div class="container">
             <div class="profile-info">
@@ -321,17 +321,17 @@
                     <div class="stat-box">
                         <i class="fas fa-star"></i>
                         <div class="stat-value" id="profileTotalPoints">0</div>
-                        <div class="stat-label">Točke</div>
+                        <div class="stat-label">Points</div>
                     </div>
                     <div class="stat-box">
                         <i class="fas fa-check-circle"></i>
                         <div class="stat-value" id="profileCompletedChallenges">0</div>
-                        <div class="stat-label">Izzivi</div>
+                        <div class="stat-label">Challenges</div>
                     </div>
                 </div>
             </div>
             <button onclick="logout()" class="btn-secondary btn-full">
-                <i class="fas fa-sign-out-alt"></i> Odjava
+                <i class="fas fa-sign-out-alt"></i> Logout
             </button>
         </div>
     </div>
@@ -339,21 +339,21 @@
     <!-- Create Group Modal -->
     <div id="createGroupModal" class="modal">
         <div class="modal-content">
-            <h3><i class="fas fa-users"></i> Ustvari novo skupino</h3>
+            <h3><i class="fas fa-users"></i> Create New Group</h3>
             <div class="input-group">
                 <i class="fas fa-tag"></i>
-                <input type="text" id="newGroupName" placeholder="Ime skupine">
+                <input type="text" id="newGroupName" placeholder="Group name">
             </div>
             <div class="input-group">
                 <i class="fas fa-align-left"></i>
-                <textarea id="newGroupDescription" placeholder="Opis skupine"></textarea>
+                <textarea id="newGroupDescription" placeholder="Group description"></textarea>
             </div>
             <div class="modal-actions">
                 <button onclick="createGroup()" class="btn-primary">
-                    <i class="fas fa-check"></i> Ustvari
+                    <i class="fas fa-check"></i> Create
                 </button>
                 <button onclick="closeCreateGroupModal()" class="btn-secondary">
-                    <i class="fas fa-times"></i> Prekliči
+                    <i class="fas fa-times"></i> Cancel
                 </button>
             </div>
         </div>
@@ -366,33 +366,33 @@
             <p id="challengeDescription"></p>
             <p class="challenge-points">
                 <i class="fas fa-star"></i>
-                Točke: <span id="challengePoints"></span>
+                Points: <span id="challengePoints"></span>
             </p>
 
             <div id="photoUpload" style="display:none;">
-                <label><i class="fas fa-camera"></i> Naloži fotografijo:</label>
+                <label><i class="fas fa-camera"></i> Upload photo:</label>
                 <input type="file" id="photoInput" accept="image/*">
             </div>
 
             <div id="qrScan" style="display:none;">
                 <button class="btn-secondary">
-                    <i class="fas fa-qrcode"></i> Skeniraj QR kodo
+                    <i class="fas fa-qrcode"></i> Scan QR code
                 </button>
             </div>
 
             <div id="userConfirm" style="display:none;">
                 <div class="input-group">
                     <i class="fas fa-user"></i>
-                    <input type="text" placeholder="Uporabniško ime osebe">
+                    <input type="text" placeholder="Person's username">
                 </div>
             </div>
 
             <div class="modal-actions">
                 <button onclick="completeChallenge()" class="btn-primary">
-                    <i class="fas fa-check-circle"></i> Dokonči izziv
+                    <i class="fas fa-check-circle"></i> Complete Challenge
                 </button>
                 <button onclick="closeChallengeModal()" class="btn-secondary">
-                    <i class="fas fa-times"></i> Zapri
+                    <i class="fas fa-times"></i> Close
                 </button>
             </div>
         </div>
@@ -401,11 +401,11 @@
     <!-- Invite Friends Modal -->
     <div id="inviteFriendsModal" class="modal">
         <div class="modal-content">
-            <h3><i class="fas fa-user-plus"></i> Povabi prijatelje v skupino</h3>
+            <h3><i class="fas fa-user-plus"></i> Invite Friends to Group</h3>
             <div id="friendsToInviteList" class="friends-list"></div>
             <div class="modal-actions">
                 <button onclick="closeInviteFriendsModal()" class="btn-secondary">
-                    <i class="fas fa-times"></i> Zapri
+                    <i class="fas fa-times"></i> Close
                 </button>
             </div>
         </div>
